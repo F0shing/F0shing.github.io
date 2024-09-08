@@ -164,4 +164,3 @@ const apiUrl = 'https://api.franime.fr/api/calendrier_data'; // URL de l'API
 
           // Appeler la fonction pour récupérer les animes au chargement de la page
           fetchAnimes();
-
