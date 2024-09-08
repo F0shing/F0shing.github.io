@@ -28,6 +28,12 @@
   height: auto;
   margin-bottom: auto;
   margin-top: min(3em, 5%);
+  transition: transform 0.15s ease-out;
+  cursor: pointer;
+}
+
+.anime-card:hover {
+  transform: scale(1.05);
 }
 
 .anime-card img {
@@ -96,10 +102,12 @@
   font-size: 18px;
   height: 50px;
   width: 50px;
+  transition: transform 0.15s ease-out;
 }
 
 .page-button:hover {
   transform: scale(1.2);
+  background-color: var(--hover-clr);
 }
 
 .page-button.active {
