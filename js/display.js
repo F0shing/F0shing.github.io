@@ -57,15 +57,16 @@ function handleSearch(event) {
 }
 
 
-// Get anime rating from source URL
+// Get anime rating and YouTube video ID from source URL
 async function getAnimeRating(anime) {
   try {
     const response = await fetch(anime.source_url);
     const data = await response.json();
     anime.averageRating = data.data.attributes.averageRating;
+    anime.youtubeVideoId = data.data.attributes.youtubeVideoId;
     return anime;
   } catch (error) {
-    console.error(`Error fetching rating for ${anime.titleO}:, error`);
+    console.error(`Error fetching rating for ${anime.titleO}:`, error);
     return anime;
   }
 }
@@ -91,10 +92,20 @@ function createAnimeCard(anime, container) {
     if (anime.averageRating) {
       const rating = document.createElement('div');
       rating.classList.add('anime-rating');
-      const ratingValue = (anime.averageRating / 10).toFixed(1); // Convert rating to /10 and round to 1 decimal place
+      const ratingValue = (anime.averageRating / 10).toFixed(2); // Convert rating to /10 and round to 1 decimal place
       rating.textContent = (`Rating: ${ratingValue}/10`);
       animeCard.appendChild(rating);
     }
+
+    // Add event listener to redirect to YouTube video
+    animeCard.addEventListener('click', () => {
+      if (anime.youtubeVideoId) {
+        const youtubeUrl = `https://www.youtube.com/watch?v=${anime.youtubeVideoId}`;
+        window.open(youtubeUrl, '_blank');
+      } else {
+        console.error('No YouTube video ID found for this anime');
+      }
+    });
 
     container.appendChild(animeCard);
   };
