@@ -1,0 +1,91 @@
+.buttons-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding: min(3em, 10%);
+  flex-wrap: wrap;
+}
+
+.day-button {
+  width: 200px;
+  font-size: 32px;
+  color: var(--text-clr);
+  background-color: var(--base-clr);
+  border: 1px solid var(--line-clr);
+  border-radius: 1em;
+  margin-top: 5px;
+  margin-bottom: 25px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  transition: background-color 0.15s ease-out;
+  transition: transform 0.15s ease-out;
+  cursor: pointer;
+}
+
+.day-button:hover {
+  background-color: var(--hover-clr);
+  transform: scale(1.1);
+}
+
+.anime-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  flex-wrap: wrap;
+
+  gap: 4em;
+  padding: min(3em, 15%);
+
+  border: 1px solid var(--line-clr);
+  border-radius: 1em;
+}
+
+.anime-card {
+  color: white !important;
+  margin-bottom: auto;
+  margin-top: min(3em, 5%);
+}
+
+.anime-card img {
+  width: auto;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.anime-details {
+  color: white !important;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 1fr;
+}
+
+.anime-title {
+  color: white !important;
+}
+
+.anime-date {
+  color: white !important;
+}
+
+.anime-link {
+  color: var(--accent-clr) !important;
+  text-decoration: none !important;
+  font-weight: bold;
+}
+
+.anime-lang {
+  color: white !important;
+}
+
+.anime-card.hidden {
+  display: none;
+}
+
+.day-button.active {
+  background-color: var(--accent-clr);
+}
+
+.affiche-display {
+  display: inline;
+}

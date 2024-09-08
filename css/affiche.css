@@ -1,0 +1,138 @@
+:root {
+  --base-clr: #18181b;
+  --line-clr: #42434a;
+  --hover-clr: #222533;
+  --text-clr: #e6e6ef;
+  --accent-clr: #5e63ff;
+  --secondary-text-clr: #b0b3c1;
+  --cardsbackground-clr: #27272a;
+}
+
+.anime-container {
+  height: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  flex-wrap: wrap;
+
+  gap: 4em;
+  padding: min(3em, 15%);
+
+  border: 1px solid var(--line-clr);
+  border-radius: 1em;
+}
+
+.anime-card {
+  color: white !important;
+  padding: 10px;
+  width: 250px;
+  height: auto;
+  margin-bottom: auto;
+  margin-top: min(3em, 5%);
+}
+
+.anime-card img {
+  width: 250px;
+  height: 300px;
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 30px 60px -12px inset, rgba(0, 0, 0, 0.3) 0px 18px 36px -18px inset;
+}
+
+.anime-details {
+  color: white !important;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 1fr;
+}
+
+.anime-title {
+  color: white !important;
+}
+
+.anime-date {
+  color: white !important;
+}
+
+.anime-link {
+  color: var(--accent-clr) !important;
+  text-decoration: none !important;
+  font-weight: bold;
+}
+
+.anime-lang {
+  color: white !important;
+}
+
+.day-button.active {
+  background-color: var(--accent-clr);
+}
+
+.affiche-display {
+  display: inline;
+}
+
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 25px;
+  margin-top: 20px;
+  border: 1px solid var(--line-clr);
+  border-radius: 1em;
+  height: auto;
+}
+
+.page-button {
+  padding: 10px;
+  margin: 5px;
+  background-color: var(--base-clr);
+  border: 1px solid var(--line-clr);
+  cursor: pointer;
+  color: var(--text-clr);
+
+  border-radius: 4px;
+  font-size: 18px;
+  height: 50px;
+  width: 50px;
+}
+
+.page-button:hover {
+  transform: scale(1.2);
+}
+
+.page-button.active {
+  background-color: var(--accent-clr);
+  border-radius: 4px;
+  color: white;
+}
+
+.search-container {
+  display: flex;
+  align-items: center;
+  margin: 20px 0;
+}
+
+.search-input {
+  width: auto;
+  max-width: 500px;
+  padding: 10px;
+  border: 1px solid var(--line-clr);
+  border-radius: 5px;
+  background-color: var(--base-clr);
+  color: var(--text-clr);
+  font-size: 1em;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--accent-clr);
+}
+
+
+.anime-themes {
+  font-size: 14px;
+  color: #666;
+  margin-top: 5px;
+}
