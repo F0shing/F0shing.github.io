@@ -1,139 +1,148 @@
-const apiUrl = '/api/franime.json'; // Path to your JSON file
-let currentPage = 1; // Start with the first page
-const itemsPerPage = 60; // Number of items per page
-let animeData = []; // Store the fetched anime data
+const maxId = 14269;
+const apiUrlTemplate = 'https://kitsu.io/api/edge/anime/{id}';
+const genresUrlTemplate = 'https://kitsu.io/api/edge/anime/{id}/genres';
+const animeGrid = document.getElementById('anime-grid');
+const pagination = document.getElementById('pagination');
+const prevPageButton = document.getElementById('prev-page');
+const nextPageButton = document.getElementById('next-page');
+const pageNumberSpan = document.getElementById('page-number');
+const pageInput = document.getElementById('page-input');
 
-// Fetch and display animes with pagination and search filtering
-async function fetchAnimes(page = 1, searchQuery = '') {
-  try {
-    const response = await fetch(apiUrl);
-    const data = await response.json();
-    animeData = data; // Store data for filtering
+pageInput.addEventListener('keydown', function (event) {
+  if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+    event.preventDefault();
+  }
+});
 
-    if (data && Array.isArray(data)) {
-      const animeContainer = document.getElementById('animeContainer');
-      animeContainer.innerHTML = ''; // Clear previous content
+let currentPage = 1;
+let itemsPerPage = 25; // 5 x 5 images per page
 
-      // Filter the data based on the search query
-      const filteredData = data.filter(anime =>
-        anime.titleO.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+function loadAnimePage(page) {
+  animeGrid.innerHTML = ''; // Clear the grid
+  const startIndex = (page - 1) * itemsPerPage + 1;
+  const endIndex = startIndex + itemsPerPage - 1;
+  let animeDataList = [];
 
-      // Get anime ratings for each anime
-      const animeDataWithRatings = await Promise.all(filteredData.map(getAnimeRating));
+  // Fetch all anime data for the current page
+  const fetchPromises = [];
+  for (let i = startIndex; i <= endIndex; i++) {
+    const apiUrl = apiUrlTemplate.replace('{id}', i);
+    const fetchPromise = fetch(apiUrl)
+      .then(response => response.json())
+      .then(data => {
+        if (data.data) {
+          const imageUrl = data.data.attributes.posterImage.original;
+          const animeName = data.data.attributes.canonicalTitle;
+          const averageRating = data.data.attributes.averageRating || 0; // Handle cases with no rating
+          const youtubeVideoId = data.data.attributes.youtubeVideoId; // Fetch YouTube video ID
 
-      // Sort the filtered data by rating in descending order
-      const sortedData = animeDataWithRatings.sort((a, b) => {
-        const ratingA = a.averageRating ? (a.averageRating / 10).toFixed(1) : 0;
-        const ratingB = b.averageRating ? (b.averageRating / 10).toFixed(1) : 0;
-        return ratingB - ratingA;
+          // Fetch genres
+          const genresUrl = genresUrlTemplate.replace('{id}', i);
+          return fetch(genresUrl)
+            .then(response => response.json())
+            .then(genresData => {
+              const genres = genresData.data.map(genre => genre.attributes.name).join(', ') || 'Unknown';
+
+              animeDataList.push({
+                imageUrl,
+                animeName,
+                averageRating: parseFloat(averageRating), // Ensure rating is a number
+                genres,
+                youtubeVideoId, // Add YouTube video ID to the data list
+              });
+            });
+        }
+      })
+      .catch(error => {
+        console.error(`Error fetching anime ${i}:`, error);
       });
 
-      // Calculate the range for the current page
-      const start = (page - 1) * itemsPerPage;
-      const end = page * itemsPerPage;
-
-      // Get data for the current page
-      const paginatedData = sortedData.slice(start, end);
-
-      // Create anime cards for the current page
-      await Promise.all(paginatedData.map(async (anime) => {
-        createAnimeCard(anime, animeContainer);
-      }));
-
-      // Add pagination controls
-      createPaginationControls(sortedData.length, page);
-    } else {
-      console.error('Unexpected API data structure');
-    }
-  } catch (error) {
-    console.error('Error fetching animes:', error);
+    fetchPromises.push(fetchPromise);
   }
-}
 
-function handleSearch(event) {
-  const searchQuery = event.target.value;
-  fetchAnimes(1, searchQuery); // Fetch animes with the search query and reset to page 1
-}
+  // After all data is fetched, sort it and render
+  Promise.all(fetchPromises).then(() => {
+    // Sort the animeDataList by rating in descending order
+    animeDataList.sort((a, b) => b.averageRating - a.averageRating);
 
+    // Render sorted anime data as cards
+    animeDataList.forEach(anime => {
+      const animeCard = document.createElement('div');
+      animeCard.classList.add('anime-card');
 
-// Get anime rating and YouTube video ID from source URL
-async function getAnimeRating(anime) {
-  try {
-    const response = await fetch(anime.source_url);
-    const data = await response.json();
-    anime.averageRating = data.data.attributes.averageRating;
-    anime.youtubeVideoId = data.data.attributes.youtubeVideoId;
-    return anime;
-  } catch (error) {
-    console.error(`Error fetching rating for ${anime.titleO}:`, error);
-    return anime;
-  }
-}
-
-// Create anime card
-function createAnimeCard(anime, container) {
-  const img = new Image();
-  img.src = anime.affiche;
-
-  img.onload = function () {
-    const animeCard = document.createElement('div');
-    animeCard.classList.add('anime-card');
-
-    // Create image, title, and other details
-    animeCard.appendChild(img);
-
-    const title = document.createElement('div');
-    title.classList.add('anime-title');
-    title.textContent = anime.titleO;
-    animeCard.appendChild(title);
-
-    // Add rating
-    if (anime.averageRating) {
-      const rating = document.createElement('div');
-      rating.classList.add('anime-rating');
-      const ratingValue = (anime.averageRating / 10).toFixed(2); // Convert rating to /10 and round to 1 decimal place
-      rating.textContent = (`Rating: ${ratingValue}/10`);
-      animeCard.appendChild(rating);
-    }
-
-    // Add event listener to redirect to YouTube video
-    animeCard.addEventListener('click', () => {
+      // Create YouTube link
+      const youtubeLink = document.createElement('a');
       if (anime.youtubeVideoId) {
-        const youtubeUrl = `https://www.youtube.com/watch?v=${anime.youtubeVideoId}`;
-        window.open(youtubeUrl, '_blank');
-      } else {
-        console.error('No YouTube video ID found for this anime');
+        youtubeLink.href = `https://www.youtube.com/watch?v=${anime.youtubeVideoId}`;
+        youtubeLink.target = '_blank';
       }
+
+      const animeImage = document.createElement('img');
+      animeImage.src = anime.imageUrl;
+      animeImage.alt = anime.animeName;
+
+      const animeTitle = document.createElement('h3');
+      animeTitle.textContent = anime.animeName;
+
+      const animeGenres = document.createElement('p');
+      animeGenres.textContent = `Genres: ${anime.genres}`;
+      animeGenres.classList.add('anime-genres');
+
+      const animeRating = document.createElement('p');
+      animeRating.textContent = `Rating: ${anime.averageRating}`;
+      animeRating.classList.add('anime-rating');
+
+      // Append image to the link
+      youtubeLink.appendChild(animeImage);
+
+      animeCard.appendChild(youtubeLink);
+      animeCard.appendChild(animeTitle);
+      animeCard.appendChild(animeGenres);
+      animeCard.appendChild(animeRating);
+
+      animeGrid.appendChild(animeCard);
     });
-
-    container.appendChild(animeCard);
-  };
-
-  img.onerror = function () {
-    console.error(`Error loading image for ${anime.titleO}`);
-  };
+  });
 }
 
-// Create pagination controls
-function createPaginationControls(totalItems, currentPage) {
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
-  const paginationContainer = document.getElementById('paginationContainer');
-  paginationContainer.innerHTML = ''; // Clear previous pagination
+// Initial load
+loadAnimePage(currentPage);
 
-  // Create pagination buttons
-  for (let i = 1; i <= totalPages; i++) {
-    const button = document.createElement('button');
-    button.textContent = i;
-    button.classList.add('page-button');
-    if (i === currentPage) {
-      button.classList.add('active');
-    }
+nextPageButton.addEventListener('click', () => {
+  currentPage++;
+  loadAnimePage(currentPage);
+  updatePagination();
+  updateUrl();
+});
 
-    button.addEventListener('click', () => fetchAnimes(i));
-    paginationContainer.appendChild(button);
+prevPageButton.addEventListener('click', () => {
+  currentPage--;
+  loadAnimePage(currentPage);
+  updatePagination();
+  updateUrl();
+});
+
+pageInput.addEventListener('change', () => {
+  const newPage = parseInt(pageInput.value, 10);
+  if (newPage >= 1 && newPage <= Math.ceil(maxId / itemsPerPage)) {
+    currentPage = newPage;
+    loadAnimePage(currentPage);
+    updatePagination();
+    updateUrl();
+  } else {
+    pageInput.value = currentPage; // Reset to current page if out of range
   }
+});
+
+function updatePagination() {
+  const totalPages = Math.ceil(maxId / itemsPerPage);
+  pageNumberSpan.textContent = `Page ${currentPage} of ${totalPages}`;
+  prevPageButton.disabled = currentPage === 1;
+  nextPageButton.disabled = currentPage === totalPages;
+  pageInput.value = currentPage;
 }
 
-// Fetch animes on page load
-fetchAnimes(currentPage);
+function updateUrl() {
+  const newUrl = `${window.location.pathname}?page=${currentPage}`;
+  window.history.pushState({ path: newUrl }, '', newUrl);
+}
