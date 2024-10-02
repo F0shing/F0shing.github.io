@@ -8,6 +8,10 @@
   --cardsbackground-clr: #27272a;
 }
 
+* {
+  color: white;
+}
+
 .anime-container {
   height: auto;
   display: grid;
@@ -143,4 +147,51 @@
   font-size: 14px;
   color: #666;
   margin-top: 5px;
+}
+
+
+/* Add some basic styling to the pagination buttons */
+#pagination {
+  text-align: center;
+  border: var(--line-clr) 1px solid;
+  border-radius: 1em;
+  margin-top: 20px;
+  padding: 30px;
+  display: flex;
+  flex-wrap: wrap-reverse;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+#prev-page, #next-page {
+  background-color: var(--accent-clr);
+  width: 1fr;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  font-size: 22px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: transform 0.15s ease-out;
+}
+
+#prev-page:hover, #next-page:hover {
+  background-color: var(--hover-clr);
+  transform: scale(1.05);
+}
+
+#prev-page:disabled, #next-page:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.page-input {
+  width: 1fr;
+  background-color: var(--base-clr);
+  border: var(--line-clr) 1px solid;
+  color: #fff;
+  padding: 10px 20px;
+  font-size: 22px;
+  border-radius: 8px;
 }

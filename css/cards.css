@@ -1,7 +1,10 @@
 .buttons-container {
   display: flex;
+  border: 1px solid var(--line-clr);
+  border-radius: 1em;
   flex-direction: row;
-  justify-content: space-between;
+  align-items: center;
+  justify-content: space-evenly;
   margin-bottom: 20px;
   padding: min(3em, 10%);
   flex-wrap: wrap;
@@ -13,7 +16,7 @@
   color: var(--text-clr);
   background-color: var(--base-clr);
   border: 1px solid var(--line-clr);
-  border-radius: 1em;
+  border-radius: 0.4em;
   margin-top: 5px;
   margin-bottom: 25px;
   padding-top: 20px;
@@ -44,6 +47,7 @@
   color: white !important;
   margin-bottom: auto;
   margin-top: min(3em, 5%);
+  cursor: pointer;
 }
 
 .anime-card img {
